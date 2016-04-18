@@ -2,11 +2,17 @@
 #created at https://github.com/gjelsas/paperwork-multiexport
 import os
 import shutil
+from os.path import expanduser
 
 
-# The top argument for walk
-topdir = 'path/to/your/paperwork/dir' #maybe get this from the .config/paperwork.conf file one day...
-destination = 'path/to/your/export/dir'  
+#topdir = '/home/georg/ownCloud/Dokumente/papers'              #use this for windows maybe? or if your detection doesn't work!
+home = expanduser("~")
+for line in open(home + '/.config/paperwork.conf'): #get the paperworkdir from config file, works on linux
+    if 'workdirectory'in line:                      #maybe needs to be commented out on windows?
+        a,b = line.split(' = ')                     #the define topdir above to set your topdir manually
+print ('Autodetecting your paperworkconfiguration\nYou are using this paperworkdirectory: ' + b)
+topdir = b.rstrip()
+
 extension = input ("what are you looking for? press 1 for words and 2 for labels:  ")                #specify the ending/the filename could also becom the words file?
 if extension == "1":
     exten = 'words'
@@ -16,7 +22,14 @@ else:
     print("Exiting the programm")
     quit()
 
-keyword = input("Please Enter the label you are looking for:  ")      #keyword we will be looking for
+
+keyword = input('\n\nPlease Enter the expression you are looking for:  ')      #keyword we will be looking for
+
+destination = input('\n\nPlease give define your export directory \n!!!but beware: Files will be overwritten!!! -> ') + "/"            #specify your destination
+if not os.path.exists(destination):
+    os.makedirs(destination)
+
+
 i = 0
 
 
@@ -56,14 +69,24 @@ for dirpath, dirnames, files in os.walk(topdir):
                         if name.endswith((".pdf"))]
                     jpglist = list(filter(isjpg,filter(isnotthumb,thumblist)))            #use function above to filter averything exept .jpg files and filter thumbs
                     i = i +10
+
                     for item in jpglist:
                         i = 1 + i
                         I = str(i)
-                        print (item + "->" + destination + I + '.jpg')
-                        shutil.copy2 (item, destination + I + '.jpg')
+                        try:
+                            shutil.copyfile (item, destination + I + '.jpg')
+                            print (item + "->" + destination + I + '.jpg')
+                        except IOError:
+                            print ("Unable to copy file!")
+
                     for item in pdflist:
                         I = str(i+1)
-                        print (item + "->" + destination + I + '.pdf')
-                        shutil.copy2 (item, destination + I + '.pdf')
+                        try:
+                            shutil.copyfile (item, destination + I + '.pdf')
+                            print (item + "->" + destination + I + '.pdf')
+                        except IOError:
+                            print ("Unable to copy file!")
+
+
 
 quit()                        
