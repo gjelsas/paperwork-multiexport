@@ -5,7 +5,7 @@ import shutil
 from os.path import expanduser
 
 
-#topdir = '/home/georg/ownCloud/Dokumente/papers'              #use this for windows maybe? or if your detection doesn't work!
+#topdir = '/home/$USER/papers'              #use this if your detection doesn't work!
 home = expanduser("~")
 for line in open(home + '/.config/paperwork.conf'): #get the paperworkdir from config file, works on linux
     if 'workdirectory'in line:                      #maybe needs to be commented out on windows?
